@@ -134,7 +134,7 @@ func (s *service) Analyze(text string) Result {
 	if total == 0 {
 		return Result{
 			Sentiment: "neutral",
-			Score:     1.0,
+			Score:     0.0,
 			Breakdown: Breakdown{Neutral: 1.0},
 		}
 	}
