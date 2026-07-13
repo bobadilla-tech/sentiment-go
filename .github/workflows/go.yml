@@ -1,0 +1,24 @@
+name: Run tests and upload coverage
+on:
+  push
+jobs:
+  build:
+    name: Run tests and collect coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+
+      - name: Install Dependencies
+        run: go mod download
+
+      - name: Run Tests with coverage
+        run: go test -v -coverprofile=coverage.txt ./...
+
+      - name: Upload coverage report to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: bobadilla-tech/sentiment-go
