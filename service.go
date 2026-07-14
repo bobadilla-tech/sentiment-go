@@ -49,32 +49,32 @@ type Result struct {
 	Breakdown Breakdown `json:"breakdown"`
 }
 
-type service struct {
+type Service struct {
 	lexicon       map[string]float64
 	negationWords map[string]bool
 	intensifiers  map[string]float64
 }
 
 // Option configures a Service.
-type Option func(*service)
+type Option func(*Service)
 
 // WithLexicon overrides the sentiment lexicon (word -> valence, range [-0.9, 0.9]).
 func WithLexicon(lex map[string]float64) Option {
-	return func(s *service) {
+	return func(s *Service) {
 		s.lexicon = lex
 	}
 }
 
 // WithNegationWords overrides the set of negation words.
 func WithNegationWords(words map[string]bool) Option {
-	return func(s *service) {
+	return func(s *Service) {
 		s.negationWords = words
 	}
 }
 
 // WithIntensifiers overrides the intensifier multipliers.
 func WithIntensifiers(intensifiers map[string]float64) Option {
-	return func(s *service) {
+	return func(s *Service) {
 		s.intensifiers = intensifiers
 	}
 }
@@ -105,8 +105,8 @@ func ValidateLexicon(lex map[string]float64) error {
 	return nil
 }
 
-func NewService(opts ...Option) (*service, error) {
-	s := &service{
+func NewService(opts ...Option) (*Service, error) {
+	s := &Service{
 		lexicon:       defaultLexicon(),
 		negationWords: negationWords,
 		intensifiers:  intensifiers,
@@ -125,7 +125,7 @@ func NewService(opts ...Option) (*service, error) {
 // Analyze computes the sentiment of the given text, returning a label
 // ("positive", "negative", or "neutral"), a confidence score, and a
 // probability breakdown across the three classes.
-func (s *service) Analyze(text string) Result {
+func (s *Service) Analyze(text string) Result {
 	tokens := tokenize(text)
 
 	posScore, negScore := s.scoreTokens(tokens)
@@ -199,7 +199,7 @@ func round2(f float64) float64 {
 
 // scoreTokens iterates over tokens, applying negation and intensifier
 // modifiers, and returns separate positive and negative valence sums.
-func (s *service) scoreTokens(tokens []string) (posSum, negSum float64) {
+func (s *Service) scoreTokens(tokens []string) (posSum, negSum float64) {
 	// negationLeft tracks how many subsequent tokens are still under a negation.
 	negationLeft := 0
 	// intensifierMult carries an intensifier multiplier into the next token.
