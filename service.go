@@ -65,20 +65,6 @@ func WithLexicon(lex map[string]float64) Option {
 	}
 }
 
-// WithNegationWords overrides the set of negation words.
-func WithNegationWords(words map[string]bool) Option {
-	return func(s *Service) {
-		s.negationWords = words
-	}
-}
-
-// WithIntensifiers overrides the intensifier multipliers.
-func WithIntensifiers(intensifiers map[string]float64) Option {
-	return func(s *Service) {
-		s.intensifiers = intensifiers
-	}
-}
-
 // ValidateLexicon checks that every value in lex falls within the
 // [-0.9, 0.9] range expected by the scoring algorithm. Lexicons with a
 // different native scale (e.g. AFINN's raw -5..5 integers) must be
