@@ -128,13 +128,21 @@ func NewService(opts ...Option) (*Service, error) {
 func (s *Service) Analyze(text string) Result {
 	tokens := tokenize(text)
 
+	if len(tokens) == 0 {
+		return Result{
+			Sentiment: "neutral",
+			Score:     0.0,
+			Breakdown: Breakdown{Neutral: 0.0},
+		}
+	}
+
 	posScore, negScore := s.scoreTokens(tokens)
 	total := posScore + negScore
 
 	if total == 0 {
 		return Result{
 			Sentiment: "neutral",
-			Score:     0.0,
+			Score:     1.0,
 			Breakdown: Breakdown{Neutral: 1.0},
 		}
 	}

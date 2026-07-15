@@ -47,7 +47,7 @@ func TestAnalyze_EmptyInput(t *testing.T) {
 	assert.Equal(t, Breakdown{
 		Positive: 0,
 		Negative: 0,
-		Neutral:  1,
+		Neutral:  0,
 	}, got.Breakdown)
 }
 
@@ -71,7 +71,7 @@ func TestAnalyze_UnknownWords(t *testing.T) {
 			got := svc.Analyze(tt.text)
 
 			assert.Equal(t, "neutral", got.Sentiment)
-			assert.Equal(t, 0.0, got.Score)
+			assert.Equal(t, 1.0, got.Score)
 			assert.Equal(t, Breakdown{
 				Positive: 0,
 				Negative: 0,
