@@ -42,7 +42,7 @@ type Breakdown struct {
 	Neutral  float64 `json:"neutral"`
 }
 
-// Result is the response payload for the sentiment
+// Result is the response payload for the sentiment analisis.
 type Result struct {
 	Sentiment string    `json:"sentiment"`
 	Score     float64   `json:"score"`
@@ -50,7 +50,10 @@ type Result struct {
 }
 
 type Service struct {
-	lexicon       map[string]float64
+	lexicon map[string]float64 // configurable via WithLexicon
+
+	// negationWords and intensifiers are always the package defaults;
+	// there is currently no Option to override them (see NewService).
 	negationWords map[string]bool
 	intensifiers  map[string]float64
 }
