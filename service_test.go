@@ -1,15 +1,27 @@
 package sentiment
 
 import (
+	"log"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
+var testSvc *Service
+
+func TestMain(m *testing.M) {
+	svc, err := NewService()
+	if err != nil {
+		log.Fatalf("failed to init service for tests: %v", err)
+	}
+	testSvc = svc
+
+	os.Exit(m.Run())
+}
+
 func TestAnalyze_Negation(t *testing.T) {
 	t.Parallel()
-	svc, err := NewService()
-	assert.NoError(t, err)
 
 	tests := []struct {
 		name string
@@ -27,7 +39,7 @@ func TestAnalyze_Negation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got := svc.Analyze(tt.text)
+			got := testSvc.Analyze(tt.text)
 
 			assert.Equal(t, tt.want, got.Sentiment,
 				"Analyze(%q) returned breakdown %+v", tt.text, got.Breakdown)
@@ -37,10 +49,8 @@ func TestAnalyze_Negation(t *testing.T) {
 
 func TestAnalyze_EmptyInput(t *testing.T) {
 	t.Parallel()
-	svc, err := NewService()
-	assert.NoError(t, err)
 
-	got := svc.Analyze("")
+	got := testSvc.Analyze("")
 
 	assert.Equal(t, "neutral", got.Sentiment)
 	assert.Equal(t, 0.0, got.Score)
@@ -53,8 +63,6 @@ func TestAnalyze_EmptyInput(t *testing.T) {
 
 func TestAnalyze_UnknownWords(t *testing.T) {
 	t.Parallel()
-	svc, err := NewService()
-	assert.NoError(t, err)
 
 	tests := []struct {
 		name string
@@ -68,7 +76,7 @@ func TestAnalyze_UnknownWords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got := svc.Analyze(tt.text)
+			got := testSvc.Analyze(tt.text)
 
 			assert.Equal(t, "neutral", got.Sentiment)
 			assert.Equal(t, 1.0, got.Score)
@@ -83,8 +91,6 @@ func TestAnalyze_UnknownWords(t *testing.T) {
 
 func TestAnalyze_Intensifiers(t *testing.T) {
 	t.Parallel()
-	svc, err := NewService()
-	assert.NoError(t, err)
 
 	tests := []struct {
 		name string
@@ -100,8 +106,8 @@ func TestAnalyze_Intensifiers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			base := svc.Analyze(tt.base)
-			intense := svc.Analyze(tt.more)
+			base := testSvc.Analyze(tt.base)
+			intense := testSvc.Analyze(tt.more)
 
 			assert.Equal(t, "positive", intense.Sentiment)
 			assert.Greater(t,
