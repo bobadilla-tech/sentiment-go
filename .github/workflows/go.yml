@@ -1,24 +1,47 @@
-name: Run tests and upload coverage
+name: CI
+
 on:
-  push
+  push:
+    branches: [main]
+
 jobs:
-  build:
-    name: Run tests and collect coverage
+  test:
+    name: Test & Coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v7
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
+        with:
+          go-version: stable
 
-      - name: Install Dependencies
+      - name: Cache Go modules
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cache/go-build
+            ${{ github.workspace }}/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install dependencies
         run: go mod download
 
-      - name: Run Tests with coverage
-        run: go test -v -coverprofile=coverage.txt ./...
+      - name: Run tests with coverage
+        run: |
+          set -o pipefail
+          go test ./... -covermode=atomic -coverprofile=coverage.out
 
-      - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v5
+      - name: Show coverage summary
+        if: always()
+        run: go tool cover -func=coverage.out | sed -n '$p'
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: bobadilla-tech/sentiment-go
+          files: coverage.out
+          fail_ci_if_error: true

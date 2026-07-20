@@ -19,10 +19,13 @@ var (
 func defaultLexicon() map[string]float64 {
 	afinnOnce.Do(func() {
 		var raw map[string]int
+
 		if err := json.Unmarshal(afinnRaw, &raw); err != nil {
 			panic("sentiment: invalid embedded lexicon.json: " + err.Error())
 		}
+		
 		afinnData = make(map[string]float64, len(raw))
+		
 		for word, score := range raw {
 			// Rescale AFINN's -5..5 range to this package's -0.9..0.9 range.
 			afinnData[word] = (float64(score) / 5.0) * 0.9
